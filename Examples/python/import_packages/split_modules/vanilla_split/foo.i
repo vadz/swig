@@ -1,9 +1,4 @@
-#if defined(SWIGPYTHON_BUILTIN) /* defined when using -builtin */
-%module(package="pkg1", moduleimport="from $module import *") foo
-#else
-%module(package="pkg1", moduleimport="import $module") foo
-#endif
-
+%module(package="pkg1") foo
 %{
 static unsigned count(void)
 {
