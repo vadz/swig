@@ -6534,7 +6534,7 @@ The code is generated into the pure Python module, foo.py, and merely imports th
 
 <div class="targetlang">
 <pre>
-if __package__ or '.' in __name__:
+if __package__ or __name__.rpartition('.')[0]:
     from . import _foo
 else:
     import _foo
@@ -6619,7 +6619,7 @@ The default import loading code is thus different:
 
 <div class="targetlang">
 <pre>
-if __package__ or '.' in __name__:
+if __package__ or __name__.rpartition('.')[0]:
     from ._foo import *
 else:
     from _foo import *
