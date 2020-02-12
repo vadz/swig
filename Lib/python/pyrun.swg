@@ -7,8 +7,8 @@
  *
  * ----------------------------------------------------------------------------- */
 
-#if PY_VERSION_HEX < 0x02070000 /* 2.7.0 */
-# error "This version of SWIG only supports Python >= 2.7"
+#if PY_VERSION_HEX < 0x02060000 /* 2.6.0 */
+# error "This version of SWIG only supports Python >= 2.6"
 #endif
 
 #if PY_VERSION_HEX >= 0x03000000 && PY_VERSION_HEX < 0x03020000
@@ -1360,8 +1360,8 @@ SWIG_Python_GetModule(void *SWIGUNUSEDPARM(clientdata)) {
 # ifdef SWIGPY_USE_CAPSULE
     type_pointer = PyCapsule_Import(SWIGPY_CAPSULE_NAME, 0);
 # else
-    type_pointer = PyCObject_Import("swig_runtime_data" SWIG_RUNTIME_VERSION,
-				    "type_pointer" SWIG_TYPE_TABLE_NAME);
+    type_pointer = PyCObject_Import((char *)"swig_runtime_data" SWIG_RUNTIME_VERSION,
+				    (char *)"type_pointer" SWIG_TYPE_TABLE_NAME);
 # endif
     if (PyErr_Occurred()) {
       PyErr_Clear();
