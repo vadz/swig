@@ -163,6 +163,7 @@
 #define WARN_TYPE_ABSTRACT            403
 #define WARN_TYPE_REDEFINED           404
 #define WARN_TYPE_RVALUE_REF_QUALIFIER_IGNORED 405
+#define WARN_TYPE_NSPACE_SETTING      406
 
 /* Unused since 4.1.0: #define WARN_TYPEMAP_SOURCETARGET     450 */
 #define WARN_TYPEMAP_CHARLEAK         451
@@ -268,6 +269,11 @@
 #define WARN_R_TYPEMAP_RTYPECHECK_UNDEF       751
 
 /* please leave 750-759 free for R */
+
+#define WARN_C_TYPEMAP_CTYPE_UNDEF            760
+#define WARN_C_UNSUPPORTTED                   761
+
+/* please leave 760-779 free for C */
 
 #define WARN_RUBY_WRONG_NAME                  801
 #define WARN_RUBY_MULTIPLE_INHERITANCE        802
