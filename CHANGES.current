@@ -7,6 +7,18 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-22: Nerixyz
+            [Python] #2165 #3518 The INPUT, INOUT and OUTPUT typemaps in typemaps.i now
+            carry pytyping typemaps, so a parameter using them is annotated with the type
+            it really takes or returns rather than the catch-all typing.Any:
+
+              %apply double *OUTPUT { double *out };
+              void my_func(double *out);
+
+            is now annotated:
+
+              def my_func() -> "float":
+
 2026-08-16: wsfulton
             [Python] #3532 New python:annotations:catchall feature supplies the PEP 484
             annotation for everything a function returns when SWIG cannot work it out

@@ -503,3 +503,15 @@ if annotations_supported:
     if anno != {"first": "int", "last": "float", "return": "typing.List[int]"}:
         raise RuntimeError("annotations mismatch: {}".format(anno))
     swig_check(argoutBoolMultiargReplaceBetweenFirstLast(5, 6.0), [])
+
+    anno = get_annotations(singleOutput)
+    if anno != {"x": "int", "y": "int", "return": "int"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    anno = get_annotations(twoInputs)
+    if anno != {"IN1": "int", "IN2": "int", "return": "bool"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    anno = get_annotations(inout)
+    if anno != {"x": "int", "INOUT": "int", "return": "int"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))

@@ -34,14 +34,14 @@ if annotations_supported:
     check(get_annotations(divide), {
         "numerator": "int",
         "denominator": "int",
-        "return": "typing.List[typing.Union[typing.Any, typing.Any]]",
+        "return": "typing.List[typing.Union[int, int]]",
     })
 
     # The return value is the first element of that list
     check(get_annotations(divide_checked), {
         "numerator": "int",
         "denominator": "int",
-        "return": "typing.List[typing.Union[bool, typing.Any, typing.Any]]",
+        "return": "typing.List[typing.Union[bool, int, int]]",
     })
 
     check(get_annotations(Widget.getId), {"return": "int"})
