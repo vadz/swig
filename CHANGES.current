@@ -7,6 +7,12 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-09-03: larskanis, wsfulton
+            #3534 Fix configure error "Tools/convertpath: No such file or directory" on
+            MinGW. The removed convertpath tool was still used to compute the SWIG library
+            directory, so a MinGW build installed to a Unix style prefix could not find the
+            SWIG library files. Regression in 4.5.0.
+
 2026-09-03: jschueller, wsfulton
             #3555 Remove the minimum PCRE2 version required by the CMake build, as SWIG
             only uses PCRE2 API available since the first PCRE2 release, matching the
