@@ -69,13 +69,19 @@
 %include <typemaps/swigtypemaps.swg>
 
 #ifndef SWIG_INOUT_NODEF
-/* Add INOUT/INPUT/OUTPUT support for the pytyping typemap */
+/* Add INOUT/INPUT/OUTPUT support for the pytyping typemap. Only the pointer forms of INPUT and INOUT accept a null
+   pointer, so only they are annotated with typing.Optional. INOUT returns what it was given, so it returns None too. */
 %define %_pytyping_inout_define(Code, Type)
   %typemap(pytyping)
     Type *OUTPUT, Type &OUTPUT,
-    Type *INPUT, Type &INPUT,
-    Type *INOUT, Type &INOUT
+    Type &INPUT,
+    Type &INOUT
   "$typemap(pytyping, Type)"
+
+  %typemap(pytyping)
+    Type *INPUT,
+    Type *INOUT
+  "typing.Optional[$typemap(pytyping, Type)]"
 %enddef
 %apply_checkctypes(%_pytyping_inout_define)
 #endif

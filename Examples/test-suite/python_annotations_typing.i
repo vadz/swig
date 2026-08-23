@@ -693,10 +693,20 @@ bool argoutBoolMultiargReplaceBetweenFirstLast(int first, short **short_list_rep
 
 %apply int *INPUT { short *IN1, short *IN2 };
 
+/* The reference forms reject a null pointer, so they are annotated with the plain type,
+   unlike the pointer forms which accept one and are annotated with typing.Optional. */
+%apply int &INPUT  { int &refIn };
+%apply int &OUTPUT { int &refOut };
+%apply int &INOUT  { int &refInOut };
+
 %inline %{
 
 void singleOutput(int x, int y, int *OUTPUT) {}
 bool twoInputs(short *IN1, short *IN2) { return true; }
 void inout(int x, int *INOUT) {}
+
+void refInput(int &refIn) {}
+void refOutput(int &refOut) {}
+void refInout(int &refInOut) {}
 
 %}

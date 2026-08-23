@@ -1,4 +1,4 @@
-from swig_test_utils import swig_annotations_in_stub, swig_assert, swig_check, swig_get_annotations
+from swig_test_utils import swig_annotations_in_stub, swig_assert, swig_assert_raises, swig_check, swig_get_annotations
 
 from python_annotations_typing import *
 
@@ -504,14 +504,47 @@ if annotations_supported:
         raise RuntimeError("annotations mismatch: {}".format(anno))
     swig_check(argoutBoolMultiargReplaceBetweenFirstLast(5, 6.0), [])
 
+    # OUTPUT is not a parameter of the wrapped function and always returns a value
     anno = get_annotations(singleOutput)
     if anno != {"x": "int", "y": "int", "return": "int"}:
         raise RuntimeError("annotations mismatch: {}".format(anno))
 
+    # The pointer form of INPUT accepts a null pointer, which is None, as well as a value
     anno = get_annotations(twoInputs)
-    if anno != {"IN1": "int", "IN2": "int", "return": "bool"}:
+    if anno != {
+        "IN1": "typing.Optional[int]",
+        "IN2": "typing.Optional[int]",
+        "return": "bool",
+    }:
         raise RuntimeError("annotations mismatch: {}".format(anno))
 
+    # INOUT returns what it was given, so it returns None when given None
     anno = get_annotations(inout)
-    if anno != {"x": "int", "INOUT": "int", "return": "int"}:
+    if anno != {
+        "x": "int",
+        "INOUT": "typing.Optional[int]",
+        "return": "typing.Optional[int]",
+    }:
         raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    # The reference forms reject a null pointer, so they take and return a plain value
+    anno = get_annotations(refInput)
+    if anno != {"refIn": "int", "return": "None"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    anno = get_annotations(refOutput)
+    if anno != {"return": "int"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    anno = get_annotations(refInout)
+    if anno != {"refInOut": "int", "return": "int"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+# The annotations above describe what the typemaps really accept and return
+swig_check(twoInputs(None, None), True)
+swig_check(inout(1, None), None)
+swig_check(inout(1, 5), 5)
+with swig_assert_raises(TypeError):
+    refInput(None)
+with swig_assert_raises(TypeError):
+    refInout(None)
