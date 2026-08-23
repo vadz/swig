@@ -1312,7 +1312,17 @@ PYFLAGS           = -Werror
 PYCODESTYLE       = @PYCODESTYLE@
 PYCODESTYLE_FLAGS = --ignore=E252,E30,E402,E501,E731,W291,W391
 PYREFLY           = @PYREFLY@
-PYREFLY_FLAGS     = --summary=none --python-interpreter-path=$(PYTHON) --search-path=. --ignore=missing-import
+PYREFLY_FLAGS     = --summary=none --preset=default --python-interpreter-path=$(PYTHON) --search-path=. --ignore=missing-import
+# Generated modules import their C extension module, which is a shared library that pyrefly cannot read
+PYREFLY_FLAGS    += --ignore=missing-module-attribute
+# Member variables are emitted as an annotated assignment whose value is a property object, not the annotated type
+PYREFLY_FLAGS    += --ignore=bad-assignment
+# 'this' is added from C, and the runme scripts use module attributes re-exported from the unreadable extension
+PYREFLY_FLAGS    += --ignore=missing-attribute
+# Overloaded methods are emitted as an untyped *args dispatcher that does not match the signature it overrides
+PYREFLY_FLAGS    += --ignore=bad-override
+# A multi-argument typemap is annotated with the C type of its first parameter, not what the typemap accepts
+PYREFLY_FLAGS    += --ignore=bad-argument-type
 PYABI3AUDIT	  = @PYABI3AUDIT@
 
 # ----------------------------------------------------------------

@@ -11,7 +11,17 @@ PY_VER_3_DIGIT    = @PY_VER_3_DIGIT@
 PYCODESTYLE       = @PYCODESTYLE@
 PYCODESTYLE_FLAGS = --ignore=E252,E30,E402,E501,E731,E741,W291,W391
 PYREFLY           = @PYREFLY@
-PYREFLY_FLAGS     = --summary=none --python-interpreter-path=$(PYTHON) --search-path=. --ignore=missing-import --error=bad-function-definition
+PYREFLY_FLAGS     = --summary=none --preset=default --python-interpreter-path=$(PYTHON) --search-path=. --ignore=missing-import
+# Generated modules import their C extension module, which is a shared library that pyrefly cannot read
+PYREFLY_FLAGS    += --ignore=missing-module-attribute
+# Member variables are emitted as an annotated assignment whose value is a property object, not the annotated type
+PYREFLY_FLAGS    += --ignore=bad-assignment
+# 'this' is added to the proxy instance from C, so the class body never declares it for __disown__ to use
+PYREFLY_FLAGS    += --ignore=missing-attribute
+# Overloaded methods are emitted as an untyped *args dispatcher that does not match the signature it overrides
+PYREFLY_FLAGS    += --ignore=bad-override
+# A member variable named after a builtin shadows that builtin in the annotations in its own class body
+PYREFLY_FLAGS    += --ignore=not-a-type
 
 HAVE_CXX11   = @HAVE_CXX11@
 HAVE_CXX14   = @HAVE_CXX14@
