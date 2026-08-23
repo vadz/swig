@@ -44,6 +44,11 @@ check_array(li_typemaps.inoutr_bool(false), [false])
 // the others
 check_array(li_typemaps.inoutr_int2(1,2), [1, 2])
 
+// Two parameters using the same typemap
+check(li_typemaps.in_int_multi(3, 4), 7)
+check_array(li_typemaps.out_int_multi(5, 6), [5, 6])
+check_array(li_typemaps.inout_int_multi(7, 8), [14, 24])
+
 fi = li_typemaps.out_foo(10)
 check(fi[0].a, 10)
 check(fi[1], 20)

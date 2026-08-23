@@ -25,5 +25,12 @@ check_equal(out_int(7), 7, "out_int");
 check_equal(inout_int(7), 7, "inout_int");
 check_equal(inoutr_int(7), 7, "inoutr_int");
 
+% Two parameters using the same typemap
+check_equal(in_int_multi(3, 4), 7, "in_int_multi");
+[a, b] = out_int_multi(5, 6);
+check_equal(a + b, 11, "out_int_multi");
+[c, d] = inout_int_multi(7, 8);
+check_equal(c + d, 38, "inout_int_multi");
+
 check_nullref_rejected(@inr_int, "inr_int");
 check_nullref_rejected(@inoutr_int, "inoutr_int");

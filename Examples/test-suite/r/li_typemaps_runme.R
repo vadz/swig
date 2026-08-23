@@ -21,3 +21,6 @@ check_nullref_rejected <- function(wrapper, name) {
 
 check_nullref_rejected("R_swig_inr_int", "inr_int")
 check_nullref_rejected("R_swig_inoutr_int", "inoutr_int")
+
+# The in_int_multi/out_int_multi/inout_int_multi tests other languages have are missing here as R cannot call them:
+# INPUT and INOUT reject a plain value and OUTPUT fails in SET_VECTOR_ELT, both of which predate this test.

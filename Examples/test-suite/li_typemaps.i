@@ -2,7 +2,9 @@
 
 %include "typemaps.i"
 
+%apply int *INPUT { int *INPUT2 };
 %apply int *OUTPUT { int *OUTPUT2 };
+%apply int *INOUT { int *INOUT2 };
 %apply int &INOUT { int &INOUT2 };
 %newobject out_foo;
 %inline %{
@@ -105,6 +107,11 @@ void inoutr_longlong(long long &INOUT) {  INOUT = INOUT; }
 void inoutr_ulonglong(unsigned long long &INOUT) {  INOUT = INOUT; }
 
 void inoutr_int2(int &INOUT, int &INOUT2) {  INOUT = INOUT; INOUT2 = INOUT2;}
+
+// Two parameters using the same typemap, checking each is wrapped independently of the other
+int in_int_multi(int *INPUT, int *INPUT2) { return *INPUT + *INPUT2; }
+void out_int_multi(int x, int y, int *OUTPUT, int *OUTPUT2) { *OUTPUT = x; *OUTPUT2 = y; }
+void inout_int_multi(int *INOUT, int *INOUT2) { *INOUT *= 2; *INOUT2 *= 3; }
 
 %}
 

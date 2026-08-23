@@ -14,6 +14,11 @@ check_equal [ out_int 7 ] 7 "out_int"
 check_equal [ inout_int 7 ] 7 "inout_int"
 check_equal [ inoutr_int 7 ] 7 "inoutr_int"
 
+# Two parameters using the same typemap
+check_equal [ in_int_multi 3 4 ] 7 "in_int_multi"
+check_equal [ out_int_multi 5 6 ] {5 6} "out_int_multi"
+check_equal [ inout_int_multi 7 8 ] {14 24} "inout_int_multi"
+
 # A reference cannot be bound to a null pointer, so NULL is rejected rather than dereferenced in the call
 proc check_nullref_rejected {fn} {
 	if { [ catch { $fn NULL } err_msg ] != 1 } {
