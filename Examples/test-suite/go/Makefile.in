@@ -188,6 +188,7 @@ clean:
 	rm -f import_share_c.go import_share_c.gox
 	rm -f import_stl_a.go import_stl_a.gox
 	rm -f import_stl_b.go import_stl_b.gox
+	rm -f import_stl_c.go import_stl_c.gox
 	rm -f imports_a.go imports_a.gox imports_b.go imports_b.gox
 	rm -f mod_a.go mod_a.gox mod_b.go mod_b.gox
 	rm -f multi_import_a.go multi_import_a.gox

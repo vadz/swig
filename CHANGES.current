@@ -7,6 +7,22 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-24: wsfulton
+            [Python] #3537 Fix "'SWIGPY_SLICEOBJECT' was not declared in this scope" when
+            compiling the wrappers for a module that %imports another module which has
+            already included the STL containers, and then instantiates a container of its
+            own:
+
+              %module b
+              %import "a.i"             // a.i already has %include <std_vector.i>
+              %include <std_vector.i>
+              %template(DoubleVector) std::vector<double>;
+
+            The second %include is a no-op, as std_vector.i was read while processing the
+            %import, so the definition of SWIGPY_SLICEOBJECT was emitted into the wrapper
+            for 'a' only, while the slice methods generated for 'b' went on using it. The
+            definition is now a fragment and so is emitted into each wrapper that needs it.
+
 2026-08-23: wsfulton
             [Python] #3518 The pytyping typemaps added for the INPUT, INOUT and OUTPUT
             typemaps in typemaps.i are no longer all the same, as the typemaps do not all

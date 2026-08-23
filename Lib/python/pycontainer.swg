@@ -13,8 +13,6 @@
 
 %{
 #include <iostream>
-
-#define SWIGPY_SLICEOBJECT PyObject
 %}
 
 
@@ -31,6 +29,10 @@
 %fragment("<stdexcept>");
 
 %include <std_except.i>
+
+%fragment("SWIGPY_SLICEOBJECT", "header") %{
+#define SWIGPY_SLICEOBJECT PyObject
+%}
 
 %fragment("container_owner_attribute_init", "init") {
   // thread safe initialization
@@ -573,6 +575,7 @@ namespace swig {
   %swig_container_methods(%arg(Sequence))
 
   %fragment("SwigPySequence_Base");
+  %fragment("SWIGPY_SLICEOBJECT");
 
 #if defined(SWIGPYTHON_BUILTIN)
   //%feature("python:slot", "sq_item", functype="ssizeargfunc") __getitem__;
