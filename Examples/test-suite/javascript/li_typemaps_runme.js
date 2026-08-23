@@ -48,3 +48,16 @@ fi = li_typemaps.out_foo(10)
 check(fi[0].a, 10)
 check(fi[1], 20)
 check(fi[2], 30)
+
+// A reference cannot be bound to a null pointer, so null is rejected rather than dereferenced in the call
+function check_throws(fn, name) {
+  try {
+    fn()
+  } catch (e) {
+    return
+  }
+  throw new Error("Expected an exception from " + name)
+}
+
+check_throws(function() { li_typemaps.inr_int(null) }, "inr_int")
+check_throws(function() { li_typemaps.inoutr_int(null) }, "inoutr_int")

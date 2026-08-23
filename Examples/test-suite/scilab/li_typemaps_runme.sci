@@ -113,4 +113,14 @@ checkequal(inoutr_float(2.5), 2.5, "inoutr_float");
 //f,i = out_foo(10)
 //checkequal(f.a, 10 || i, 20), "");
 
+// A reference cannot be bound to a null pointer, so a null pointer is rejected rather than dereferenced
+ierr = execstr("inr_int(SWIG_ptr(0))", "errcatch");
+if ierr == 0 then
+  swigtesterror("inr_int accepted a null pointer for a reference");
+end
+ierr = execstr("inoutr_int(SWIG_ptr(0))", "errcatch");
+if ierr == 0 then
+  swigtesterror("inoutr_int accepted a null pointer for a reference");
+end
+
 exec("swigtest.quit", -1);

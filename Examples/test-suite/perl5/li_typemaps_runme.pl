@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Test::More tests => 416;
+use Test::More tests => 418;
 BEGIN { use_ok('li_typemaps') }
 require_ok('li_typemaps');
 
@@ -84,4 +84,8 @@ is($int2, 30);
 my($a, $b) = li_typemaps::inoutr_int2(13, 31);
 is($a, 13);
 is($b, 31);
+
+# A reference cannot be bound to a null pointer, so undef is rejected rather than dereferenced in the call
+ok(!eval { li_typemaps::inr_int(undef); 1 }, 'inr_int undef rejected');
+ok(!eval { li_typemaps::inoutr_int(undef); 1 }, 'inoutr_int undef rejected');
 

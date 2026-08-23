@@ -7,6 +7,22 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-23: wsfulton
+            [JavaScript, Octave, Perl, Python, R, Ruby, Scilab, Tcl]
+            Fix a crash when a null pointer is passed to a parameter using the INPUT or
+            INOUT typemaps in typemaps.i for a reference, such as int &INPUT. A reference
+            cannot be bound to a null pointer, but one was accepted and then dereferenced
+            when making the call. It is now rejected with a null reference error, the same
+            as for a plain SWIGTYPE & parameter and for the INPUT typemaps covering types
+            such as std::string. For example:
+
+              %apply int &INPUT { int &value };
+              int get(int &value);
+
+            passing the target language's null value, such as None in Python, to get now
+            raises an error instead of crashing. The pointer typemaps, such as int *INPUT,
+            are unchanged and continue to accept a null pointer.
+
 2026-08-22: Nerixyz
             [Python] #2165 #3518 The INPUT, INOUT and OUTPUT typemaps in typemaps.i now
             carry pytyping typemaps, so a parameter using them is annotated with the type
