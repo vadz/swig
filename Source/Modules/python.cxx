@@ -964,7 +964,8 @@ public:
         Printv(f_shadow_py, f_shadow_stubs, "\n", NIL);
 
       // Emit type wrapper classes for the opaque types referenced by annotations
-      emitTypeWrapperClasses(f_shadow_py, true);
+      if (!pyi_stub)
+        emitTypeWrapperClasses(f_shadow_py, true);
 
       Delete(f_shadow_py);
     }
@@ -5343,6 +5344,12 @@ public:
       if (!builtin) {
         printClassHeader(n, class_name, f_shadow, true);
 
+        // The 'this' attribute is added to each instance by the C code, so declare it for the benefit of type
+        // checkers. It is a variable annotation, so 'novar' turns it off along with all the others.
+        if (getTypeAnnotationMode(n) == TYPE_ANNOTATION_TYPING && !GetFlag(n, "feature:python:annotations:novar")) {
+          Printv(f_shadow, tab4, "if typing.TYPE_CHECKING:\n", NIL);
+          Printv(f_shadow, tab8, "this: \"typing.Any\"\n", NIL);
+        }
         Printv(f_shadow, tab4, "thisown = property(lambda x: x.this.own(), ", "lambda x, v: x.this.own(v), doc=\"The membership flag\")\n", NIL);
         /* Add static attribute */
         if (GetFlag(n, "feature:python:nondynamic")) {

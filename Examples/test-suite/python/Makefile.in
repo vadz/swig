@@ -16,8 +16,6 @@ PYREFLY_FLAGS     = --summary=none --preset=default --python-interpreter-path=$(
 PYREFLY_FLAGS    += --ignore=missing-module-attribute
 # Member variables are emitted as an annotated assignment whose value is a property object, not the annotated type
 PYREFLY_FLAGS    += --ignore=bad-assignment
-# 'this' is added to the proxy instance from C, so the class body never declares it for __disown__ to use
-PYREFLY_FLAGS    += --ignore=missing-attribute
 # Overloaded methods are emitted as an untyped *args dispatcher that does not match the signature it overrides
 PYREFLY_FLAGS    += --ignore=bad-override
 # A member variable named after a builtin shadows that builtin in the annotations in its own class body

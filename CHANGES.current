@@ -7,6 +7,25 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-24: wsfulton
+            [Python] #3528 The proxy classes generated with -typehints now declare the 'this'
+            attribute, which is added to each instance by the C code and so was not visible
+            to type checkers analysing the __disown__ method:
+
+              class Base(object):
+                  if typing.TYPE_CHECKING:
+                      this: "typing.Any"
+
+            The declaration is also generated when -pyi is used, as the .py file still
+            contains the __disown__ method that uses it. It is a variable annotation, so the
+            python:annotations:novar feature turns it off along with all the others, keeping
+            a novar build free of the PEP 526 syntax that requires Python 3.6.
+
+            Bug fix so that the type wrapper classes are no longer generated into the .py
+            file when -pyi is specified, as they were always present in the .pyi file. They
+            only exist to give an annotation a named type to refer to and the annotations
+            are all in the .pyi file when -pyi is used.
+
 2026-08-23: wsfulton
             [Python] #3518 The pytyping typemaps added for the INPUT, INOUT and OUTPUT
             typemaps in typemaps.i are no longer all the same, as the typemaps do not all

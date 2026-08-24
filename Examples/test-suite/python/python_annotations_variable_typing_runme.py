@@ -1,3 +1,4 @@
+import ast
 import sys
 
 from swig_test_utils import swig_annotations_in_stub, swig_get_annotations
@@ -35,3 +36,21 @@ if sys.version_info[0:2] >= (3, 6):
         anno = get_annotations(StructWithVarNotAnnotated)
         if anno != {}:
             raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    # 'this' is a variable annotation, so novar turns it off along with the others, keeping the
+    # generated code free of the PEP 526 syntax that requires Python 3.6. -builtin has no proxy classes.
+    with open("python_annotations_variable_typing.py") as f:
+        tree = ast.parse(f.read(), filename="python_annotations_variable_typing.py")
+
+    def declares_this(class_name):
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef) and node.name == class_name:
+                return any(isinstance(x, ast.AnnAssign) and getattr(x.target, "id", None) == "this"
+                           for x in ast.walk(node))
+        return None
+
+    if declares_this("StructWithVar") is not None:
+        if not declares_this("StructWithVar"):
+            raise RuntimeError("StructWithVar should declare 'this'")
+        if declares_this("StructNovar"):
+            raise RuntimeError("StructNovar is novar so it should not declare 'this'")
