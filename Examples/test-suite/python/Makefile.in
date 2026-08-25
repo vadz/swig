@@ -18,8 +18,6 @@ PYREFLY_FLAGS    += --ignore=missing-module-attribute
 PYREFLY_FLAGS    += --ignore=bad-assignment
 # Overloaded methods are emitted as an untyped *args dispatcher that does not match the signature it overrides
 PYREFLY_FLAGS    += --ignore=bad-override
-# A member variable named after a builtin shadows that builtin in the annotations in its own class body
-PYREFLY_FLAGS    += --ignore=not-a-type
 
 HAVE_CXX11   = @HAVE_CXX11@
 HAVE_CXX14   = @HAVE_CXX14@
