@@ -84,6 +84,7 @@ static int have_constructor = 0;
 static int have_repr = 0;
 static bool have_builtin_static_member_method_callback = false;
 static bool have_fast_proxy_static_member_method_callback = false;
+static bool have_annotated_membervariable = false;
 static String *real_classname;
 
 /* Thread Support */
@@ -820,6 +821,10 @@ public:
       }
 
       if (!builtin) {
+        /* Annotated member variables need the _swig_property helper, but whether any are annotated is not
+           known until they have all been emitted, so it is expanded into this marker afterwards. */
+        Printv(f_shadow, "$swigpropertyhelper", NIL);
+
         Printv(f_shadow,
                "\n",
                "def _swig_repr(self):\n",
@@ -957,6 +962,18 @@ public:
       } else {
         Printv(f_shadow_py, default_import_code, NIL);
       }
+
+      const char *property_helper =
+        have_annotated_membervariable
+          ? "\n"
+            "# Member variables are annotated with the type they return, so create the property via a helper.\n"
+            "if typing.TYPE_CHECKING:\n"
+            "    def _swig_property(fget: \"typing.Any\", fset: \"typing.Any\" = ..., doc: \"typing.Any\" = ...) -> \"typing.Any\":\n"
+            "        ...\n"
+            "else:\n"
+            "    _swig_property = property\n"
+          : "";
+      Replaceall(f_shadow, "$swigpropertyhelper", property_helper);
 
       if (Len(f_shadow) > 0)
         Printv(f_shadow_py, "\n", f_shadow, "\n", NIL);
@@ -5933,7 +5950,10 @@ public:
       String *getname = Swig_name_get(NSPACE_TODO, mname);
       int assignable = !is_immutable(n);
       String *variable_annotation = variableAnnotation(n);
-      Printv(f_shadow, tab4, symname, variable_annotation, " = property(", module, ".", getname, NIL);
+      bool annotated = Len(variable_annotation) > 0;
+      if (annotated)
+        have_annotated_membervariable = true;
+      Printv(f_shadow, tab4, symname, variable_annotation, annotated ? " = _swig_property(" : " = property(", module, ".", getname, NIL);
       if (assignable)
         Printv(f_shadow, ", ", module, ".", setname, NIL);
       if (have_docstring(n)) {

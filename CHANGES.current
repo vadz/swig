@@ -7,6 +7,19 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-25: wsfulton
+            [Python] #3528 Annotated member variables are now created with a _swig_property helper
+            instead of calling property directly:
+
+              class V(object):
+                  val: "float" = _swig_property(_example.V_val_get, _example.V_val_set)
+
+            The variable annotation declares the type the property returns, but the value
+            assigned is a property object, which type checkers reject. The helper returns
+            typing.Any when typing.TYPE_CHECKING is set and is just an alias for property at
+            runtime, so the generated code behaves exactly as before. Member variables that
+            are not annotated, such as when -typehints is not used, are unchanged.
+
 2026-08-24: wsfulton
             [Python] #3528 The proxy classes generated with -typehints now declare the 'this'
             attribute, which is added to each instance by the C code and so was not visible

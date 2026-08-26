@@ -14,8 +14,6 @@ PYREFLY           = @PYREFLY@
 PYREFLY_FLAGS     = --summary=none --preset=default --python-interpreter-path=$(PYTHON) --search-path=. --ignore=missing-import
 # Generated modules import their C extension module, which is a shared library that pyrefly cannot read
 PYREFLY_FLAGS    += --ignore=missing-module-attribute
-# Member variables are emitted as an annotated assignment whose value is a property object, not the annotated type
-PYREFLY_FLAGS    += --ignore=bad-assignment
 # Overloaded methods are emitted as an untyped *args dispatcher that does not match the signature it overrides
 PYREFLY_FLAGS    += --ignore=bad-override
 
