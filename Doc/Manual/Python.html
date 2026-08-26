@@ -7070,6 +7070,30 @@ def global_overloaded(*args) -&gt; "int *":
 </pre></div>
 
 <p>
+An overloaded method is decorated with <tt>_swig_dispatch</tt>, which is generated near the top of the module:
+</p>
+
+<div class="targetlang"><pre>
+if typing.TYPE_CHECKING:
+    _SwigT = typing.TypeVar("_SwigT")
+
+    def _swig_dispatch(f: typing.Callable[..., _SwigT]) -&gt; typing.Callable[..., _SwigT]:
+        ...
+else:
+    def _swig_dispatch(f):
+        return f
+</pre></div>
+
+<p>
+A <tt>*args</tt> parameter list cannot accept the keyword arguments that a named parameter list accepts, so
+an overloaded method is a narrower signature than any base class method it overrides and type checkers
+reject it. The decorator does nothing at runtime, but when type checking it replaces the parameter list
+with <tt>...</tt>, which is compatible with any signature, while keeping the annotated return type.
+Any other method generated with a <tt>*args</tt> parameter list is decorated in the same way, such as when
+the <a href="SWIGPlus.html#SWIGPlus_default_args">compactdefaultargs</a> feature is used.
+</p>
+
+<p>
 Below is an example demonstrating variable annotations.
 </p>
 

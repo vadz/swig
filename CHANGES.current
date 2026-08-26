@@ -7,6 +7,32 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-26: wsfulton
+            [Python] #3528 Overloaded methods generated with -typehints are now decorated with
+            a _swig_dispatch helper:
+
+              class Derived(Base):
+                  @_swig_dispatch
+                  def f(self, *args) -> "None":
+                      return _example.Derived_f(self, *args)
+
+            An overloaded method is generated as a *args dispatcher, which cannot accept the
+            keyword arguments that a named parameter list accepts and so is a narrower
+            signature than any base class method it overrides, which type checkers reject. The
+            decorator does nothing at runtime, but when type checking it replaces the parameter
+            list with ..., which is compatible with any signature, keeping the return type.
+
+            The same applies to any other method generated with a *args parameter list, such as
+            when the compactdefaultargs feature is used.
+
+            A .pyi stub file is never executed, so a dispatcher declared in one is widened with
+            a **kwargs parameter instead of being decorated:
+
+              class Derived(Base):
+                  @staticmethod
+                  def create(*args, **kwargs) -> "Widget":
+                      ...
+
 2026-08-25: wsfulton
             [Python] #3528 Annotated member variables are now created with a _swig_property helper
             instead of calling property directly:

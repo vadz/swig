@@ -85,6 +85,7 @@ static int have_repr = 0;
 static bool have_builtin_static_member_method_callback = false;
 static bool have_fast_proxy_static_member_method_callback = false;
 static bool have_annotated_membervariable = false;
+static bool have_dispatcher_decorator = false;
 static String *real_classname;
 
 /* Thread Support */
@@ -824,6 +825,7 @@ public:
         /* Annotated member variables need the _swig_property helper, but whether any are annotated is not
            known until they have all been emitted, so it is expanded into this marker afterwards. */
         Printv(f_shadow, "$swigpropertyhelper", NIL);
+        Printv(f_shadow, "$swigdispatchhelper", NIL);
 
         Printv(f_shadow,
                "\n",
@@ -974,6 +976,20 @@ public:
             "    _swig_property = property\n"
           : "";
       Replaceall(f_shadow, "$swigpropertyhelper", property_helper);
+
+      const char *dispatch_helper = have_dispatcher_decorator
+                                      ? "\n"
+                                        "# Functions that take *args resolve their arguments at runtime, so widen the signature for type checkers.\n"
+                                        "if typing.TYPE_CHECKING:\n"
+                                        "    _SwigT = typing.TypeVar(\"_SwigT\")\n"
+                                        "\n"
+                                        "    def _swig_dispatch(f: typing.Callable[..., _SwigT]) -> typing.Callable[..., _SwigT]:\n"
+                                        "        ...\n"
+                                        "else:\n"
+                                        "    def _swig_dispatch(f):\n"
+                                        "        return f\n"
+                                      : "";
+      Replaceall(f_shadow, "$swigdispatchhelper", dispatch_helper);
 
       if (Len(f_shadow) > 0)
         Printv(f_shadow_py, "\n", f_shadow, "\n", NIL);
@@ -2486,6 +2502,49 @@ public:
   }
 
   /* ------------------------------------------------------------
+   * is_pyargs_dispatcher()
+   *
+   * Check whether the real parameters must be replaced by the catch all
+   * "*args", which make_pyParmList() below does when:
+   *
+   *  1. The function is overloaded as Python doesn't support this.
+   *  2. We were explicitly asked to use the "compact" arguments form.
+   *  3. We were explicitly asked to use default args from C via the "python:cdefaultargs" feature.
+   *  4. One of the default argument values can't be represented in Python.
+   *  5. Varargs that haven't been forced to use a fixed number of arguments with %varargs.
+   * ------------------------------------------------------------ */
+
+  bool is_pyargs_dispatcher(Node *n) {
+    Node *nn = Getattr(n, "defaultargs");
+    if (nn)
+      n = nn;
+
+    Parm *parms = Getattr(n, "parms");
+    int varargs = parms ? emit_isvarargs(parms) : 0;
+
+    return is_real_overloaded(n) || GetFlag(n, "feature:compactdefaultargs") || GetFlag(n, "feature:python:cdefaultargs") || !is_representable_as_pyargs(n) ||
+           varargs != 0;
+  }
+
+  /* ------------------------------------------------------------
+   * dispatchDecorator()
+   *
+   * Overloading, compactdefaultargs, an unrepresentable default argument
+   * and varargs all emit a *args dispatcher, which is narrower than any
+   * base class method it overrides as *args cannot accept the keyword
+   * arguments the base accepts. Decorate it so that type checkers see the
+   * gradual "(...)" callable form instead, which is compatible with any
+   * signature and changes nothing at runtime.
+   * ------------------------------------------------------------ */
+
+  String *dispatchDecorator(Node *n, const char *indent) {
+    if (getTypeAnnotationMode(n) == TYPE_ANNOTATION_NONE || !is_pyargs_dispatcher(n))
+      return NewStringEmpty();
+    have_dispatcher_decorator = true;
+    return NewStringf("@_swig_dispatch\n%s", indent);
+  }
+
+  /* ------------------------------------------------------------
    * make_pyParmList()
    *
    * Generate parameter list for Python functions or methods,
@@ -2502,27 +2561,17 @@ public:
     if (nn)
       n = nn;
 
-    Parm *parms = Getattr(n, "parms");
-    int varargs = parms ? emit_isvarargs(parms) : 0;
-
     /* We prefer to explicitly list all parameters of the C function in the
        generated Python code as this makes the function more convenient to use,
        however in some cases we must replace the real parameters list with just
-       the catch all "*args". This happens when:
-
-        1. The function is overloaded as Python doesn't support this.
-        2. We were explicitly asked to use the "compact" arguments form.
-        3. We were explicitly asked to use default args from C via the "python:cdefaultargs" feature.
-        4. One of the default argument values can't be represented in Python.
-        5. Varargs that haven't been forced to use a fixed number of arguments with %varargs.
+       the catch all "*args", see is_pyargs_dispatcher().
      */
-    if (is_real_overloaded(n) || GetFlag(n, "feature:compactdefaultargs") || GetFlag(n, "feature:python:cdefaultargs") || !is_representable_as_pyargs(n) ||
-        varargs) {
+    if (is_pyargs_dispatcher(n)) {
       String *parms = NewString("");
       if (in_class)
         Printf(parms, "self, ");
       Printf(parms, "*args");
-      if (kw)
+      if (kw || (for_stub && getTypeAnnotationMode(n) != TYPE_ANNOTATION_NONE))
         Printf(parms, ", **kwargs");
       return parms;
     }
@@ -5595,13 +5644,17 @@ public:
           String *callParms = make_pyParmList(n, true, true, allow_kwargs);
           if (!have_addtofunc(n)) {
             if (!fastproxy || olddefs) {
-              Printv(f_shadow, "\n", tab4, "def ", symname, "(", parms, ")", returnTypeAnnotation(n), ":\n", NIL);
+              String *deco = dispatchDecorator(n, tab4);
+              Printv(f_shadow, "\n", tab4, deco, "def ", symname, "(", parms, ")", returnTypeAnnotation(n), ":\n", NIL);
+              Delete(deco);
               if (Node *node_with_doc = find_overload_with_docstring(n))
                 Printv(f_shadow, tab8, docstring(node_with_doc, AUTODOC_METHOD, tab8), "\n", NIL);
               Printv(f_shadow, tab8, "return ", funcCall(fullname, callParms), "\n", NIL);
             }
           } else {
-            Printv(f_shadow, "\n", tab4, "def ", symname, "(", parms, ")", returnTypeAnnotation(n), ":\n", NIL);
+            String *deco = dispatchDecorator(n, tab4);
+            Printv(f_shadow, "\n", tab4, deco, "def ", symname, "(", parms, ")", returnTypeAnnotation(n), ":\n", NIL);
+            Delete(deco);
             if (Node *node_with_doc = find_overload_with_docstring(n))
               Printv(f_shadow, tab8, docstring(node_with_doc, AUTODOC_METHOD, tab8), "\n", NIL);
             if (have_pythonprepend(n)) {
@@ -5701,8 +5754,10 @@ public:
       if (!fast || olddefs) {
         String *parms = make_pyParmList(n, false, false, kw);
         String *callParms = make_pyParmList(n, false, true, kw);
+        String *deco = dispatchDecorator(n, tab4);
         Printv(f_shadow, "\n", tab4, "@staticmethod", NIL);
-        Printv(f_shadow, "\n", tab4, "def ", symname, "(", parms, ")", returnTypeAnnotation(n), ":\n", NIL);
+        Printv(f_shadow, "\n", tab4, deco, "def ", symname, "(", parms, ")", returnTypeAnnotation(n), ":\n", NIL);
+        Delete(deco);
         if (Node *node_with_doc = find_overload_with_docstring(n))
           Printv(f_shadow, tab8, docstring(node_with_doc, AUTODOC_STATICFUNC, tab8), "\n", NIL);
         if (have_pythonprepend(n))
