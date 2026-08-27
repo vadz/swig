@@ -7,6 +7,22 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-28: wsfulton
+            [Python] #3528 The __str__, __repr__ and __format__ methods are annotated as
+            returning str rather than typing.Optional[str] when they return a char *:
+
+              struct Foo {
+                const char *__str__() const { return "Foo"; }
+              };
+
+              def __str__(self) -> "str":
+
+            A char * is annotated with typing.Optional as it can be a null pointer, which
+            is None, but the Python data model requires these methods to return a string
+            and a TypeError is raised if they do not. Any other method returning a char *
+            is unchanged, as is one of these returning some other type, which is a genuine
+            mismatch a type checker should report.
+
 2026-08-27: wsfulton
             [Python] #3528 An overloaded function whose overloads do not all return the same type
             is now annotated typing.Any instead of the type returned by one of them:

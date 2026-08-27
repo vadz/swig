@@ -70,6 +70,15 @@ const char *overloaded_ignored(const char *s) { return s; }
 
 int overloaded_annotations_off(int x) { return x; }
 int overloaded_annotations_off(int x, int y) { return x + y; }
+
+/* The Python data model requires these to return a string, so they are annotated str rather
+   than the typing.Optional a char * is otherwise given. */
+struct StringDunders {
+  const char *__str__() const { return "s"; }
+  const char *__repr__() const { return "r"; }
+  const char *__format__(const char *spec) const { return spec; }
+  const char *not_a_dunder() const { return "n"; }
+};
 %}
 %template(TemplateShort) Space::Template<short>;
 %template(MakeShort) makeT<short>;

@@ -7275,6 +7275,29 @@ The <a href="https://docs.python.org/3/library/typing.html">typing</a> library i
 </p>
 
 <p>
+A <tt>char *</tt> is annotated <tt>typing.Optional[str]</tt> as it can be a null pointer, which is
+<tt>None</tt>. The <tt>__str__</tt>, <tt>__repr__</tt> and <tt>__format__</tt> methods are an exception, as the
+Python data model requires them to return a string and raises a <tt>TypeError</tt> if they do not, so they
+are annotated <tt>str</tt>:
+</p>
+
+<div class="code"><pre>
+struct Foo {
+  const char *__str__() const { return "Foo"; }
+  const char *describe() const { return "Foo"; }
+};
+</pre></div>
+
+<div class="targetlang"><pre>
+class Foo(object):
+    def __str__(self) -&gt; "str":
+        return _example.Foo___str__(self)
+
+    def describe(self) -&gt; "typing.Optional[str]":
+        return _example.Foo_describe(self)
+</pre></div>
+
+<p>
 If the out (return) type differs to an in type (parameter input), you can overwrite it with the <tt>out</tt> attribute:
 </p>
 

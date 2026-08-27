@@ -39,6 +39,25 @@ if annotations_supported:
     if anno != {"return": "int"}:
         raise RuntimeError("annotations mismatch: {}".format(anno))
 
+    # The data model requires these to return a string, so char * is not typing.Optional here
+    sd = StringDunders()
+    anno = get_annotations(sd.__str__)
+    if anno != {"return": "str"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    anno = get_annotations(sd.__repr__)
+    if anno != {"return": "str"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    anno = get_annotations(sd.__format__)
+    if anno != {"spec": "typing.Optional[str]", "return": "str"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    # An ordinary char * returning method is unaffected
+    anno = get_annotations(sd.not_a_dunder)
+    if anno != {"return": "typing.Optional[str]"}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
     ts = MakeShort(10)
 
     anno = get_annotations(MakeShort)
