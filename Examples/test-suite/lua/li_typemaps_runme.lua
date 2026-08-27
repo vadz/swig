@@ -35,3 +35,12 @@ assert(a==1 and b==2)
 
 f,i,i2=li_typemaps.out_foo(10)
 assert(f.a==10 and i==20 and i2==30)
+
+-- Two parameters using the same typemap
+assert(li_typemaps.in_int_multi(3, 4) ==  7)
+assert(li_typemaps.out_int_multi(5, 6) == 5, 6)
+assert(li_typemaps.inout_int_multi(7, 8) == 14, 24)
+
+-- A reference cannot be bound to a null pointer, so nil is rejected rather than dereferenced in the call
+assert(not pcall(function () li_typemaps.inr_int(nil) end))
+assert(not pcall(function () li_typemaps.inoutr_int(nil) end))
