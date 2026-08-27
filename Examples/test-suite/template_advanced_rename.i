@@ -50,3 +50,26 @@ template<typename T> struct Wonky {
 
 %rename("%(regex:/^(.*)::(.*)/\\1_\\2/)s", fullname=1) Quirky::Wonky<bool>;
 %template(WonkyBool) Quirky::Wonky<bool>;
+
+/* A wildcard class rename must not collapse a class template's partial specializations onto one name */
+%rename("%s", %$isclass) "";
+
+%inline %{
+namespace Quirky {
+template<typename T, typename U> struct Bumpy {
+  T flat(T t) { return t; }
+};
+
+template<typename T, typename U> struct Bumpy<T *, U> {
+  T *pointy(T *t) { return t; }
+};
+
+template<typename U> struct Bumpy<bool, U> {
+  bool boolish(bool b) { return b; }
+};
+}
+%}
+
+%template(BumpyInt) Quirky::Bumpy<int, short>;
+%template(BumpyPtr) Quirky::Bumpy<int *, short>;
+%template(BumpyBool) Quirky::Bumpy<bool, short>;

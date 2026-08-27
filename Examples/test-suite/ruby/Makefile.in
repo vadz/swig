@@ -19,7 +19,6 @@ SHELL_PATH_SEP = @SHELL_PATH_SEP@
 
 FAILING_CPP_TESTS = \
 	cpp17_map_no_default_ctor \
-	ruby_naming \
 
 CPP_TEST_CASES = \
 	li_cstring \

@@ -7,6 +7,23 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-28: blowekamp, wsfulton
+            #3546 Fix a %rename using a format string, such as %rename("%(camelcase)s"),
+            being applied to a class template's partial specializations under the name of
+            the primary template, so that all but one were dropped as a redefinition. The
+            template parameter stripping added in ce06e2f is now used only when a format
+            rename is applied to an instantiation created by %template, and not when
+            parsing a template declaration. This was mostly visible in Ruby's -autorename,
+            which applies a format rename to every class, where std::vector's bool and
+            pointer specializations were not wrapped at all when using swig -ruby -autorename:
+
+              %include <std_vector.i>
+              namespace std {
+                %template(VectorBool) vector<bool>;
+              }
+
+            This is a regression fix to restore the behaviour of 4.4.1 and earlier.
+
 2026-08-24: wsfulton
             [Python] #3537 Fix "'SWIGPY_SLICEOBJECT' was not declared in this scope" when
             compiling the wrappers for a module that %imports another module which has

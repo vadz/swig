@@ -1547,8 +1547,10 @@ static String *apply_rename(Node *n, String *newname, int fullname, String *pref
         String *fmt = newname;
         /* use name as a fmt, but avoid C++ "%" and "%=" operators */
         if (Len(newname) > 1 && strchr(cnewname, '%') && !(strcmp(cnewname, "%=") == 0)) {
-          /* Strip template parameters incase a template is used with %s, such as: %rename("myprefix_%s") func<int>; */
-          String *template_name = SwigType_istemplate_templateprefix(name);
+          /* Strip template parameters incase a template is used with %s, such as: %rename("myprefix_%s") func<int>;
+             Not when parsing a template declaration though, as a class template's parameters are all that distinguish
+             its partial specializations, which would otherwise collide under a wildcard rename. */
+          String *template_name = GetFlag(n, "parsing_template_declaration") ? 0 : SwigType_istemplate_templateprefix(name);
           String *name_simple = template_name ? template_name : name;
           if (fullname && prefix) {
             result = NewStringf(fmt, prefix, name_simple);

@@ -33,5 +33,12 @@ public class template_advanced_rename_runme {
       throw new RuntimeException("WONKY failed");
     if (new Quirky_Wonky().twiddle(true) != true)
       throw new RuntimeException("Quirky_Wonky failed");
+
+    if (new BumpyInt().flat(5) != 5)
+      throw new RuntimeException("BumpyInt failed");
+    if (new BumpyBool().boolish(true) != true)
+      throw new RuntimeException("BumpyBool failed");
+    if (new BumpyPtr() == null)
+      throw new RuntimeException("BumpyPtr failed");
   }
 }
