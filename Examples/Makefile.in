@@ -1317,7 +1317,7 @@ PYREFLY_FLAGS     = --summary=none --preset=default --python-interpreter-path=$(
 PYREFLY_FLAGS    += --ignore=missing-module-attribute
 # Member variables are emitted as an annotated assignment whose value is a property object, not the annotated type
 PYREFLY_FLAGS    += --ignore=bad-assignment
-# 'this' is added from C, and the runme scripts use module attributes re-exported from the unreadable extension
+# With -builtin the runme scripts use module attributes re-exported by 'import *' from the unreadable extension
 PYREFLY_FLAGS    += --ignore=missing-attribute
 # Overloaded methods are emitted as an untyped *args dispatcher that does not match the signature it overrides
 PYREFLY_FLAGS    += --ignore=bad-override
