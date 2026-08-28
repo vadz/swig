@@ -1321,8 +1321,6 @@ PYREFLY_FLAGS    += --ignore=bad-assignment
 PYREFLY_FLAGS    += --ignore=missing-attribute
 # Overloaded methods are emitted as an untyped *args dispatcher that does not match the signature it overrides
 PYREFLY_FLAGS    += --ignore=bad-override
-# A multi-argument typemap is annotated with the C type of its first parameter, not what the typemap accepts
-PYREFLY_FLAGS    += --ignore=bad-argument-type
 PYABI3AUDIT	  = @PYABI3AUDIT@
 
 # ----------------------------------------------------------------
