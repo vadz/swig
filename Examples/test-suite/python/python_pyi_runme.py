@@ -59,6 +59,11 @@ if source.index(marker) > source.index("import typing"):
 if "TYPE_CHECKING" in source:
     raise RuntimeError("python_pyi.pyi should not guard anything with typing.TYPE_CHECKING")
 
+# The low-level module stub declares everything the module exports, so it must not be marked incomplete.
+with open("_python_pyi.pyi") as f:
+    if "__getattr__" in f.read():
+        raise RuntimeError("_python_pyi.pyi should declare every export instead of a catch-all __getattr__")
+
 with open("python_pyi.py") as f:
     py_source = f.read()
 py_tree = ast.parse(py_source, filename="python_pyi.py")

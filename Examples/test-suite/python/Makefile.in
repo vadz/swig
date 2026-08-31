@@ -12,8 +12,6 @@ PYCODESTYLE       = @PYCODESTYLE@
 PYCODESTYLE_FLAGS = --ignore=E252,E30,E402,E501,E731,E741,W291,W391
 PYREFLY           = @PYREFLY@
 PYREFLY_FLAGS     = --summary=none --preset=default --python-interpreter-path=$(PYTHON) --search-path=. --ignore=missing-import
-# Generated modules import their C extension module, which is a shared library that pyrefly cannot read
-PYREFLY_FLAGS    += --ignore=missing-module-attribute
 
 HAVE_CXX11   = @HAVE_CXX11@
 HAVE_CXX14   = @HAVE_CXX14@
@@ -222,10 +220,11 @@ run_testcase = \
 
 # Clean: remove the generated Python files
 %.clean:
-	@rm -f $*.py*
+	@rm -f $*.py* _$*.pyi
 
 clean:
 	$(MAKE) -f $(top_builddir)/$(EXAMPLES)/Makefile SRCDIR='$(SRCDIR)' python_clean
+	rm -f _*.pyi
 	rm -f ../hugemod.h ../hugemod_a.i ../hugemod_b.i hugemod_a.py* hugemod_b.py* $(hugemod_runme)
 	rm -f clientdata_prop_a.py* clientdata_prop_b.py*
 	rm -f import_callback_x.py* import_callback_y.py*

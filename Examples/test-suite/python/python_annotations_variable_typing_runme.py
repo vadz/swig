@@ -18,11 +18,15 @@ if sys.version_info[0:2] >= (3, 6):
     annotations_supported = swig_annotations_in_stub() or not(is_python_builtin() or is_python_fastproxy())
 
     if annotations_supported:
-        anno = get_annotations(python_annotations_variable_typing)
-        if anno != {
+        expected = {
             "A_CONSTANT_INT": "int",
             "A_CONSTANT_SHORT": "int",
-        }:
+        }
+        # The .pyi stub file declares the global variables holder, which the .py file assigns
+        if swig_annotations_in_stub():
+            expected["cvar"] = "typing.Any"
+        anno = get_annotations(python_annotations_variable_typing)
+        if anno != expected:
             raise RuntimeError("annotations mismatch: {}".format(anno))
 
         anno = get_annotations(TemplateShort)
