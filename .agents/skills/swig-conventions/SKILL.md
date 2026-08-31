@@ -1,12 +1,13 @@
 ---
 name: swig-conventions
-description: 'SWIG source and contribution conventions: clang-format / code formatting, C/C++ comment style (quotes, widths, function header blocks), parser.y new-code rules, commit message style, hyphenation, CHANGES.current file entries for user visible release notes and AI-assistance disclosure. Read before writing or editing Source/ or Lib/ code, comments, or commit messages.'
+description: 'SWIG source and contribution conventions: clang-format / code formatting, C/C++ comment style (quotes, widths, function header blocks), parser.y new-code rules, alphabetical ordering of makefile lists, commit message style, hyphenation, CHANGES.current file entries for user visible release notes and AI-assistance disclosure. Read before writing or editing Source/ or Lib/ code, comments, or commit messages.'
 ---
 
 # SWIG Coding and Contribution Conventions
 
 ## When to use
 - Before writing or editing C/C++ code under `Source/` or `Lib/`
+- Before adding a test case to a makefile list
 - Before writing or rewording a source code comment
 - Before adding new code to `Source/CParse/parser.y`
 - Before writing a commit message
@@ -59,6 +60,25 @@ A future cleanup pass will run `clang-format` over `parser.y` to normalise the f
 To test a parse tree node's type, use `Equal(nodeType(n), "cdecl")` rather than
 `Checkattr(n, "nodeType", "cdecl")`. `nodeType(n)` is the canonical accessor for the node type
 and this idiom dominates the existing `Source/` code. Reserve `Checkattr` for other attributes.
+
+## Makefile lists
+
+All lists in the makefiles are kept in alphabetical order - the test case lists in
+`Examples/test-suite/common.mk` and in each `Examples/test-suite/<language>/Makefile.in`
+(`CPP_TEST_CASES`, `CPP11_TEST_CASES`, `C_TEST_CASES`, `MULTI_CPP_TEST_CASES`,
+`FAILING_CPP_TESTS` and the rest), and any other list of names.
+
+**Add a new entry in its alphabetical position, never at the end of the list.** Appending is the
+easy mistake to make and it is not caught by any build check, so the ordering only stays correct if
+each addition is placed deliberately.
+
+Order by the plain name as a person reads it, treating `_` as a word separator rather than as a
+character to sort on - `li_std_vectora` is listed before `li_std_vector_extra`. `sort` disagrees
+with this, since it compares `_` (0x5F) against the letter, so do not run the lists through `sort`
+to fix them up.
+
+A small amount of historical drift exists in the longer lists. Leave it alone unless the list is
+the subject of the change - reordering unrelated entries adds noise to a diff.
 
 ## Commit message style
 
