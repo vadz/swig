@@ -7,6 +7,11 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-09-03: jschueller, wsfulton
+            #3555 Remove the minimum PCRE2 version required by the CMake build, as SWIG
+            only uses PCRE2 API available since the first PCRE2 release, matching the
+            configure build which accepts any PCRE2 version.
+
 2026-08-28: blowekamp, wsfulton
             #3546 Fix a %rename using a format string, such as %rename("%(camelcase)s"),
             being applied to a class template's partial specializations under the name of
