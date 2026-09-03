@@ -1349,6 +1349,19 @@ Version 4.5.0 (06 Aug 2026)
                  int f(VOID_TYPE) const;
               };
 
+            #3556 A (void) parameter list in a member function is no longer normalized to ()
+            before %ignore, %rename and %feature name matching, so it must now be matched
+            exactly (as has always been the case for global functions):
+
+              %ignore Vec::getValue(void) const;  // matches
+              %ignore Vec::getValue() const;      // does not match
+
+              struct Vec {
+                const short *getValue(void) const;
+              };
+
+            *** POTENTIAL INCOMPATIBILITY ***
+
 2025-11-06: olly
             [Octave, Ruby] #3281 `FALSE` and `TRUE` are no longer treated as
             aliases of `false` and `true` when generating documentation comments.

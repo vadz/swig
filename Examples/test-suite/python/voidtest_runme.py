@@ -7,6 +7,10 @@ f.memberfunc()
 
 voidtest.Foo.staticmemberfunc()
 
+voidtest.globalfunc_renamed()
+f.memberfunc_renamed()
+voidtest.Foo.staticmemberfunc_renamed()
+
 fv = voidtest.FooVoidTypedef()
 fv.memberfunc()
 fv.memberfunc_const()
