@@ -1313,8 +1313,6 @@ PYCODESTYLE       = @PYCODESTYLE@
 PYCODESTYLE_FLAGS = --ignore=E252,E30,E402,E501,E731,W291,W391
 PYREFLY           = @PYREFLY@
 PYREFLY_FLAGS     = --summary=none --preset=default --python-interpreter-path=$(PYTHON) --search-path=. --ignore=missing-import
-# The .pyi stub file does not declare everything the .py file does, such as a class's enum constants
-PYREFLY_FLAGS    += --ignore=missing-attribute
 PYABI3AUDIT	  = @PYABI3AUDIT@
 
 # ----------------------------------------------------------------
