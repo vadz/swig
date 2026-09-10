@@ -34,6 +34,16 @@ if annotations_supported:
     if anno != {}:
         raise RuntimeError("annotations mismatch: {}".format(anno))
 
+    # Overloads are called with *args, so only what they all return is annotated
+    anno = get_annotations(global_overloaded)
+    if anno != {'return': 'int *'}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
+    # Overloads returning different types have no one C/C++ type to be annotated with
+    anno = get_annotations(global_overloaded_differ)
+    if anno != {}:
+        raise RuntimeError("annotations mismatch: {}".format(anno))
+
     # numoutputs=0 in the out typemap leaves nothing to return, annotated as void
     anno = get_annotations(suppressed_none)
     if anno != {'code': 'int', 'return': 'void'}:
