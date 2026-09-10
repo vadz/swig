@@ -1968,7 +1968,7 @@ else
     PYVER=0
   fi
   if test "x$PY3BIN" = xyes; then
-    for py_ver in 3 3.15 3.14 3.13 3.12 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 ""; do
+    for py_ver in 3 3.15 3.14 3.13 3.12 3.11 3.10 3.9 3.8 3.7 3.6 3.5 ""; do
       AC_CHECK_PROGS(PYTHON3, [python$py_ver])
       if test -n "$PYTHON3"; then
         AC_CHECK_PROGS(PY3CONFIG, [$PYTHON3-config])
