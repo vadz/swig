@@ -7103,32 +7103,9 @@ The generated code contains a variable annotation containing the C <tt>float</tt
 
 <div class="targetlang"><pre>
 class V(object):
-    val: "float" = _swig_property(_example.V_val_get, _example.V_val_set)
+    val: "float" = property(_example.V_val_get, _example.V_val_set)
     ...
 </pre></div>
-
-<p>
-The property is created using <tt>_swig_property</tt> rather than by calling <tt>property</tt> directly.
-The annotation declares the type that reading the variable returns, but the value assigned is a
-<tt>property</tt> object and type checkers reject the two as not matching.
-<tt>_swig_property</tt> is generated near the top of the module and is simply an alias for
-<tt>property</tt> at runtime, but is declared to return <tt>typing.Any</tt> when type checking, so it is
-the annotated type that is used:
-</p>
-
-<div class="targetlang"><pre>
-if typing.TYPE_CHECKING:
-    def _swig_property(fget: "typing.Any", fset: "typing.Any" = ..., doc: "typing.Any" = ...) -&gt; "typing.Any":
-        ...
-else:
-    _swig_property = property
-</pre></div>
-
-<p>
-It is only generated when a variable annotation is generated.
-Variables without an annotation call <tt>property</tt> directly, as in the
-<tt>python:annotations:novar</tt> example below.
-</p>
 
 <p>
 Variable annotations are only supported from Python 3.6. If you need to support earlier versions of Python, you'll need to turn variable annotations off via the <tt>python:annotations:novar</tt> feature flag.
@@ -7237,6 +7214,36 @@ with <tt>...</tt>, which is compatible with any signature, while keeping the ann
 Any other method generated with a <tt>*args</tt> parameter list is decorated in the same way, such as when
 the <a href="SWIGPlus.html#SWIGPlus_default_args">compactdefaultargs</a> feature is used. C/C++ annotations
 are not type hints and are not type checked, so they are not decorated.
+</p>
+
+<p>
+A variable annotation declares the type that reading the variable returns, but the value assigned to it is
+a <tt>property</tt> object and type checkers reject the two as not matching. The property is therefore
+created using <tt>_swig_property</tt>, which is also generated near the top of the module:
+</p>
+
+<div class="code"><pre>
+struct V {
+  float val;
+};
+</pre></div>
+
+<div class="targetlang"><pre>
+if typing.TYPE_CHECKING:
+    def _swig_property(fget: "typing.Any", fset: "typing.Any" = ..., doc: "typing.Any" = ...) -&gt; "typing.Any":
+        ...
+else:
+    _swig_property = property
+
+class V(object):
+    val: "float" = _swig_property(_example.V_val_get, _example.V_val_set)
+</pre></div>
+
+<p>
+It is an alias for <tt>property</tt> at runtime, but is declared to return <tt>typing.Any</tt> when type
+checking, so it is the annotated type that is used. It is generated only when a variable annotation is
+generated, so a variable without one calls <tt>property</tt> directly, as does a variable annotated with a
+<a href="#Python_annotations_c">C/C++ annotation type</a>, which is not type checked.
 </p>
 
 <p>

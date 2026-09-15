@@ -7,6 +7,21 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-09-06: wsfulton
+            [Python] #3528 %feature("python:annotations", "c") no longer generates the PEP 484
+            support code that only applies to %feature("python:annotations", "typing"). The
+            _swig_property helper is neither generated nor used, so a member variable creates
+            its property directly again:
+
+              class V(object):
+                  val: "float" = property(_example.V_val_get, _example.V_val_set)
+
+            The .pyi stub file no longer declares thisown, __disown__ or the cvar globals
+            holder with the typing.Any catch-all type in this mode either. C/C++ annotations
+            are not type hints and are never type checked, so code that exists solely for a
+            type checker has no purpose in them. A stub with no annotations at all, from -pyi
+            used without -typehints, still declares all three.
+
 2026-08-31: wsfulton
             [Python] #3528 A .pyi stub file is now generated for the low-level C/C++ module when
             -typehints or -pyi is used. Wrapping example.i now also generates _example.pyi

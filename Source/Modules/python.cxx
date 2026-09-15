@@ -4367,8 +4367,9 @@ public:
       if (shadow && !(shadow & PYSHADOW_MEMBER)) {
         if (!builtin)
           Printf(shadow_stubs, "%s = %s.%s\n", global_name, module, global_name);
-        /* Only for PEP 484 annotations - typing.Any is not a C/C++ annotation type */
-        if (pyi_stub && typehints)
+        /* The stub always declares what the module exports, but typing.Any is not a C/C++
+           annotation type, so it is only the C/C++ annotations that have to do without this */
+        if (pyi_stub && getTypeAnnotationMode(n) != TYPE_ANNOTATION_C)
           Printf(stub_globals, "%s: \"typing.Any\"\n", global_name);
       }
     }
@@ -4811,8 +4812,9 @@ public:
         Printv(shadow_code, tab8, "return weakref.proxy(self)\n", NIL);
         Delete(mrename);
       }
-      /* The director classes have __disown__ whether or not -builtin is used */
-      if (pyi_stub) {
+      /* The director classes have __disown__ whether or not -builtin is used and whether or not the
+         annotations are turned on, so only the C/C++ annotations, which have no typing.Any, omit it */
+      if (pyi_stub && getTypeAnnotationMode(n) != TYPE_ANNOTATION_C) {
         Printv(stub, tab4, "def __disown__(self) -> \"typing.Any\":\n", NIL);
         Printv(stub, tab8, "...\n", NIL);
       }
@@ -5552,9 +5554,10 @@ public:
       stub_indent = (String *)tab4;
     }
     int stub_class_body_start = pyi_stub ? Len(stub) : 0;
-    if (pyi_stub) {
-      /* Added to every proxy class by the C code, so declare it for the .pyi stub file too.
-         It is a property in the .py file, so it has to be declared as one here to match. */
+    if (pyi_stub && getTypeAnnotationMode(n) != TYPE_ANNOTATION_C) {
+      /* Added to every proxy class by the C code, so declare it for the .pyi stub file too. It is a
+         property in the .py file, so it has to be declared as one here to match. Only the C/C++
+         annotations omit it, as typing.Any is not a C/C++ annotation type. */
       Printv(stub, tab4, "@property\n", NIL);
       Printv(stub, tab4, "def thisown(self) -> \"typing.Any\":\n", NIL);
       Printv(stub, tab8, "...\n", NIL);
@@ -6139,7 +6142,9 @@ public:
       String *getname = Swig_name_get(NSPACE_TODO, mname);
       int assignable = !is_immutable(n);
       String *variable_annotation = variableAnnotation(n);
-      bool annotated = Len(variable_annotation) > 0;
+      /* The helper exists to reconcile the annotation with the property object assigned to it, which is
+         something only a type checker cares about, so C/C++ annotations call property directly. */
+      bool annotated = Len(variable_annotation) > 0 && getTypeAnnotationMode(n) == TYPE_ANNOTATION_TYPING;
       if (annotated)
         have_annotated_membervariable = true;
       Printv(shadow_code, tab4, symname, variable_annotation, annotated ? " = _swig_property(" : " = property(", module, ".", getname, NIL);
