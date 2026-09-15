@@ -3517,12 +3517,15 @@ public:
     }
 
     /* Create a shadow for this function (if enabled and not in a member function) */
-    if (!builtin && shadow && !(shadow & PYSHADOW_MEMBER) && use_static_method) {
+    bool module_scope = !builtin_self && !(shadow & PYSHADOW_MEMBER) && use_static_method;
+    if (!builtin && shadow && module_scope) {
       emitFunctionShadowHelper(n, in_class ? shadow_stubs : shadow_code, symname, 0);
     }
 
-    if (pyi_stub && !in_class && use_static_method) {
-      emitFunctionStubHelper(n, stub, symname, 0);
+    /* A function declared inside a class, such as a friend, is still wrapped at module scope, so its
+       declaration goes after the class body in the stub file rather than in it */
+    if (pyi_stub && module_scope) {
+      emitFunctionStubHelper(n, in_class ? stub_globals : stub, symname, 0);
     }
 
     DelWrapper(f);
@@ -4204,12 +4207,15 @@ public:
       }
 
       /* Create a shadow for this function (if enabled and not in a member function) */
-      if (!builtin && shadow && !(shadow & PYSHADOW_MEMBER) && use_static_method) {
+      bool module_scope = !builtin_self && !(shadow & PYSHADOW_MEMBER) && use_static_method;
+      if (!builtin && shadow && module_scope) {
         emitFunctionShadowHelper(n, in_class ? shadow_stubs : shadow_code, iname, allow_kwargs);
       }
 
-      if (pyi_stub && !in_class) {
-        emitFunctionStubHelper(n, stub, iname, allow_kwargs);
+      /* A function declared inside a class, such as a friend, is still wrapped at module scope, so its
+         declaration goes after the class body in the stub file rather than in it */
+      if (pyi_stub && (!in_class || module_scope)) {
+        emitFunctionStubHelper(n, in_class ? stub_globals : stub, iname, allow_kwargs);
       }
 
     } else {
@@ -6045,6 +6051,10 @@ public:
               Printv(shadow_stubs, tab4, "return val\n", NIL);
             }
           }
+          /* The renamed constructor is a module scope function, with -builtin too, so declare it
+             after the class body rather than in it */
+          if (pyi_stub)
+            emitFunctionStubHelper(n, stub_globals, symname, allow_kwargs);
         }
         Delete(subfunc);
       }

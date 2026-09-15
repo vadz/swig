@@ -7,6 +7,19 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-09-11: wsfulton
+            [Python] #3528 The .pyi stub file now declares the module scope functions that are
+            declared inside a class, such as a friend function or a renamed constructor. These
+            are wrapped at module scope but were only ever written to the proxy .py file, so a
+            type checker reading the stub could not see them:
+
+              struct Foo {
+                %rename(MakeFoo) Foo(const Foo &);
+                friend int value(const Foo &);
+              };
+
+            now declares both MakeFoo and value in the stub, after the Foo class body.
+
 2026-09-06: wsfulton
             [Python] #3528 %feature("python:annotations", "c") no longer generates the PEP 484
             support code that only applies to %feature("python:annotations", "typing"). The
