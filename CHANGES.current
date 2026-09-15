@@ -7,6 +7,16 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
 Version 4.6.0 (in progress)
 ===========================
 
+2026-08-29: wsfulton
+            [Python] #3528 The pop method generated for the sequence containers now takes the
+            optional index to remove, defaulting to the last element as before, so that
+            std::vector, std::list and std::deque behave as a Python list does:
+
+              v.pop(0)   # was a TypeError, now removes and returns the first element
+
+            The last element is still removed without walking the container, so popping from a
+            std::list is unchanged at O(1).
+
 2026-08-28: wsfulton
             [Python] #3528 The std::basic_string methods returning a string by value, such as
             substr and __str__, are now annotated str instead of the catch-all typing.Any. A
