@@ -8,6 +8,14 @@ Version 4.6.0 (in progress)
 ===========================
 
 2026-08-29: wsfulton
+            [Python] #3528 The __contains__ method generated for std::set, std::multiset,
+            std::map, std::multimap and the unordered forms of all four now returns False for
+            an object that cannot be converted to the key type, instead of raising a TypeError,
+            so that 'x in c' behaves as it does for the Python containers:
+
+              "not an int" in IntSet([1])   # was a TypeError, now False
+
+2026-08-29: wsfulton
             [Python] #3528 The pop method generated for the sequence containers now takes the
             optional index to remove, defaulting to the last element as before, so that
             std::vector, std::list and std::deque behave as a Python list does:
