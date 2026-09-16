@@ -8,6 +8,14 @@ Version 4.6.0 (in progress)
 ===========================
 
 2026-08-29: wsfulton
+            [Python] #3528 std::unordered_set and std::unordered_multiset now have the add and
+            discard methods that std::set and std::multiset already had. They are needed to
+            register the unordered containers with the abstract base classes, as
+            collections.abc.MutableSet declares both abstract:
+
+              %pythonabc(std::unordered_set, "collections.abc.MutableSet");
+
+2026-08-29: wsfulton
             [Python] #3528 The __contains__ method generated for std::set, std::multiset,
             std::map, std::multimap and the unordered forms of all four now returns False for
             an object that cannot be converted to the key type, instead of raising a TypeError,

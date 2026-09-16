@@ -114,6 +114,7 @@ endif
 
 CPP11_TEST_CASES = \
 	cpp11_hash_tables \
+	cpp11_python_abstractbase \
 	cpp11_std_unordered_map \
 	cpp11_std_unordered_multimap \
 	cpp11_std_unordered_multiset \

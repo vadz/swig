@@ -57,6 +57,14 @@
      value_type __getitem__(difference_type i) const throw (std::out_of_range) {
        return *(swig::cgetpos(self, i));
      }
+
+     void add(value_type x) {
+       self->insert(x);
+     }
+
+     void discard(value_type x) {
+       self->erase(x);
+     }
   }
 %enddef
 
