@@ -8,6 +8,16 @@ Version 4.6.0 (in progress)
 ===========================
 
 2026-08-28: wsfulton
+            [Python] #3528 The std::basic_string methods returning a string by value, such as
+            substr and __str__, are now annotated str instead of the catch-all typing.Any. A
+            method returning a pointer or a reference, such as __add__, returns the proxy class
+            rather than a str and is unchanged.
+
+            Only the instantiations converted to and from a Python str are annotated as one.
+            Any other instantiation is wrapped as a proxy object with none of the str methods
+            on it, so it keeps the catch-all type.
+
+2026-08-28: wsfulton
             [Python] #3528 The __str__, __repr__ and __format__ methods are annotated as
             returning str rather than typing.Optional[str] when they return a char *:
 
